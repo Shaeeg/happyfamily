@@ -1,6 +1,7 @@
 package com.happyfamily.model;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Pet {
     private Species species;
@@ -23,7 +24,6 @@ public class Pet {
     }
 
     public Pet(){
-
     }
 
     public void eat(){
@@ -87,5 +87,20 @@ public class Pet {
                 ", tricklevel=" + tricklevel +
                 ", habits=" + Arrays.toString(habits) +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Pet pet = (Pet) o;
+        return age == pet.age && tricklevel == pet.tricklevel && species == pet.species && Objects.equals(nickname, pet.nickname) && Objects.deepEquals(habits, pet.habits);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(species, nickname, age, tricklevel, Arrays.hashCode(habits));
+    }
+    static {
+        System.out.println("Pet object created");
     }
 }
