@@ -1,6 +1,7 @@
 package com.happyfamily.model;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Human {
     private String name;
@@ -8,8 +9,6 @@ public class Human {
     private int year;
     private int iq;
     private Pet pet;
-    private Human mother;
-    private Human father;
     private HashMap<DayOfWeek, String> schedule;
 
     public Human(String name, String surname, int year){
@@ -18,20 +17,13 @@ public class Human {
         this.year = year;
     }
 
-    public Human(String name, String surname, int year,Human father, Human mother){
-        this.name = name;
-        this.surname = surname;
-        this.year = year;
-    }
 
-    public Human(String name, String surname, int year, int iq, Pet pet, Human mother, Human father, HashMap<DayOfWeek, String> schedule) {
+    public Human(String name, String surname, int year, int iq, Pet pet, HashMap<DayOfWeek, String> schedule) {
         this.name = name;
         this.surname = surname;
         this.year = year;
         this.iq = iq;
         this.pet = pet;
-        this.mother = mother;
-        this.father = father;
         this.schedule = schedule;
     }
 
@@ -57,9 +49,23 @@ public class Human {
                 ", year=" + year +
                 ", iq=" + iq +
                 ", pet=" + pet +
-                ", mother=" + mother +
-                ", father=" + father +
                 ", schedule=" + schedule +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Human human = (Human) o;
+        return year == human.year && iq == human.iq && Objects.equals(name, human.name) && Objects.equals(surname, human.surname) && Objects.equals(pet, human.pet) && Objects.equals(schedule, human.schedule);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, surname, year, iq, pet, schedule);
+    }
+
+    static {
+        System.out.println("Human object created");
     }
 }
