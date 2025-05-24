@@ -3,7 +3,7 @@ package com.happyfamily.model;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class Pet {
+public abstract class Pet {
     private Species species;
     private String nickname;
     private int age;
@@ -30,9 +30,7 @@ public class Pet {
         System.out.println("I am eating");
     }
 
-    public void respond(){
-        System.out.printf("Hello, owner. I am %s. I miss you!", species + "\n");
-    }
+    public abstract void respond();
 
     public void foul(){
         System.out.println("I need to cover it up");
