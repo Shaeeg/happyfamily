@@ -1,5 +1,7 @@
 package com.happyfamily.model;
 
+import com.happyfamily.exceptions.ChildNotFoundException;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +30,19 @@ public class Family {
     }
 
     public void deleteChild(Human child) {
+        if (!this.children.contains(child)) {
+            throw new ChildNotFoundException("Child not found");
+        }
         this.children.remove(child);
+        System.out.println("Deleted child");
+    }
+
+    public void deleteChild(int index) throws IndexOutOfBoundsException {
+        if (index < 0 && index > this.children.size()) {
+            throw new IndexOutOfBoundsException("Index out of bounds");
+        }
+        this.children.remove(index);
+        System.out.println("Deleted child " + index);
     }
 
     public int countFamily() {

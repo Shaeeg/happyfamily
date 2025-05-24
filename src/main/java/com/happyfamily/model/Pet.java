@@ -84,7 +84,7 @@ public class Pet {
                 "species=" + species +
                 ", nickname='" + nickname + '\'' +
                 ", age=" + age +
-                ", tricklevel=" + tricklevel +
+                ", trick level=" + tricklevel +
                 ", habits=" + Arrays.toString(habits) +
                 '}';
     }
