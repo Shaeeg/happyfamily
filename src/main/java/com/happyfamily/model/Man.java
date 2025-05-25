@@ -1,15 +1,23 @@
 package com.happyfamily.model;
 
-public class Man extends Human {
+import java.util.HashMap;
+
+public final class Man extends Human {
+
     public Man(String name, String surname, int year) {
         super(name, surname, year);
     }
 
-    public Man(String name, String surname, int iq) {
-        super(name, surname, iq);
-    }
-    public void repairCar(){
-        System.out.println("He is repairing car");
+    public Man(String name, String surname, int year, int iq, Pet pet, HashMap<DayOfWeek, String> schedule) {
+        super(name, surname, year, iq, pet, schedule);
     }
 
+    @Override
+    public void greetPet() {
+        System.out.printf("Hey there, buddy! %s, how's it going?\n", getPet() != null ? getPet().getNickname() : "my pet");
+    }
+
+    public void repairCar() {
+        System.out.println("Time to get my hands dirty and fix this engine!");
+    }
 }

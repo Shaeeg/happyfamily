@@ -2,16 +2,13 @@ package com.happyfamily.model;
 
 import com.happyfamily.exceptions.ChildNotFoundException;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
-public class Family {
+public class Family implements HumanCreator {
     private Human mother;
     private Human father;
     private List<Human> children;
     private HashSet<Pet> pets;
-    private Family family;
 
     public Family() {
         this.children = new ArrayList<Human>();
@@ -21,28 +18,60 @@ public class Family {
     public Family(Human mother, Human father) {
         this.mother = mother;
         this.father = father;
-        this.children = new ArrayList<Human>();
-        this.pets = new HashSet<>();
+        this.children = new ArrayList<>();
+        this.mother.setFamily(this);
+        this.father.setFamily(this);
+    }
+
+    @Override
+    public Human bornChild(Family family, String fatherName, String motherName) {
+        Random random = new Random();
+        List<String> maleNames = Arrays.asList("Rasul", "Nejat", "Ali", "Rashad", "Nihad");
+        List<String> femaleNames = Arrays.asList("Mansura", "Zulfiyya", "Turkan", "Selcan", "Nigar");
+        int childIq = (this.getMother().getIq() + this.getFather().getIq()) / 2;
+        int currentYear = java.time.Year.now().getValue();
+
+        Human child;
+        if (random.nextBoolean()) {
+            String childName = maleNames.get(random.nextInt(maleNames.size()));
+            child = new Man(childName, father.getSurname(), currentYear, childIq, null, null);
+        } else {
+            String childName = femaleNames.get(random.nextInt(femaleNames.size()));
+            child = new Woman(childName, father.getSurname(), currentYear, childIq, null, null);
+        }
+
+        child.setFamily(this);
+        this.addChild(child);
+        return child;
     }
 
     public void addChild(Human child) {
-        this.children.add(child);
+        if (child != null) {
+            this.children.add(child);
+            child.setFamily(this);
+        }
     }
 
-    public void deleteChild(Human child) {
-        if (!this.children.contains(child)) {
-            throw new ChildNotFoundException("Child not found");
+    public boolean deleteChild(int index) {
+        if (index >= 0 && index < children.size()) {
+            Human removedChild = children.remove(index);
+            if (removedChild != null) {
+                removedChild.setFamily(null);
+            }
+            return true;
         }
-        this.children.remove(child);
-        System.out.println("Deleted child");
+        return false;
     }
 
-    public void deleteChild(int index) throws IndexOutOfBoundsException {
-        if (index < 0 && index > this.children.size()) {
-            throw new IndexOutOfBoundsException("Index out of bounds");
+    public boolean deleteChild(Human child) {
+        if (child == null) {
+            return false;
         }
-        this.children.remove(index);
-        System.out.println("Deleted child " + index);
+        boolean removed = children.remove(child);
+        if (removed) {
+            child.setFamily(null);
+        }
+        return removed;
     }
 
     public int countFamily() {
@@ -81,14 +110,6 @@ public class Family {
         this.pets = pets;
     }
 
-    public Family getFamily() {
-        return family;
-    }
-
-    public void setFamily(Family family) {
-        this.family = family;
-    }
-
     @Override
     public String toString() {
         return "Family{" +
@@ -96,11 +117,15 @@ public class Family {
                 ", father=" + father +
                 ", children=" + children +
                 ", pets=" + pets +
-                ", family=" + family +
                 '}';
     }
 
     static {
-        System.out.println("Family object created");
+        System.out.println("Family class is being loaded.");
+    }
+
+
+    {
+        System.out.println("A new Family object is being created.");
     }
 }

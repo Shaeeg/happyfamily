@@ -2,8 +2,9 @@ package com.happyfamily.model;
 
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Random;
 
-public abstract class Human {
+public class Human {
     private String name;
     private String surname;
     private int year;
@@ -14,7 +15,7 @@ public abstract class Human {
     private String[] maleNames = {"Rashad", "Shaig", "Ali", "Rasul"};
     private String[] femaleNames = {"Mansura", "Zulfiyya", "Selcan"};
 
-    public Human(String name, String surname, int year){
+    public Human(String name, String surname, int year) {
         this.name = name;
         this.surname = surname;
         this.year = year;
@@ -30,18 +31,56 @@ public abstract class Human {
         this.schedule = schedule;
     }
 
-    public Human(){
+    public Human() {
 
     }
 
-    public void greetPet(){
-        System.out.println("Hello" + pet.getNickname());
+    public void greetPet() {
+        if (pet != null) {
+            System.out.printf("Hello, %s\n", pet.getNickname());
+        } else {
+            System.out.println("I don't have a pet to greet.");
+        }
     }
 
-    public void describePet(){
-        String message = pet.getTricklevel() > 50 ?
-                String.format("I have an %s is %d years old, he is very sly", pet.getSpecies(), pet.getAge() + "\n")
-                : String.format("I have an %s is %d years old, he is almost not sly", pet.getSpecies(),  pet.getAge() + "\n");
+    public void describePet() {
+        if (pet != null) {
+            String slyness = (pet.getTrickLevel() > 50) ? "very sly" : "almost not sly";
+            System.out.printf("I have an %s, he is %d years old, he is %s.\n",
+                    pet.getSpecies().name().toLowerCase(), pet.getAge(), slyness);
+        } else {
+            System.out.println("I don't have a pet to describe.");
+        }
+    }
+
+    public boolean feedPet(boolean isFeedingTime) {
+        if (pet == null) {
+            System.out.println("I don't have a pet to feed.");
+            return false;
+        }
+
+        if (isFeedingTime) {
+            System.out.printf("Hm... I will feed %s's %s.\n", name, pet.getNickname());
+            return true;
+        } else {
+            Random random = new Random();
+            int randomNumber = random.nextInt(101);
+            if (pet.getTrickLevel() > randomNumber) {
+                System.out.printf("Hm... I will feed %s's %s.\n", name, pet.getNickname());
+                return true;
+            } else {
+                System.out.printf("I think %s is not hungry.\n", pet.getNickname());
+                return false;
+            }
+        }
+    }
+
+    public Family getFamily() {
+        return family;
+    }
+
+    public void setFamily(Family family) {
+        this.family = family;
     }
 
     public String getName() {
@@ -72,8 +111,12 @@ public abstract class Human {
         return iq;
     }
 
-    public void setIq(int iq) {
-        this.iq = iq;
+    public void setIq(int iq) throws IllegalArgumentException {
+        if (iq >= 1 && iq <= 100) {
+            this.iq = iq;
+        } else {
+            throw new IllegalArgumentException("Iq must be between 1 and 100");
+        }
     }
 
     public Pet getPet() {
@@ -122,14 +165,17 @@ public abstract class Human {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Human human = (Human) o;
-        return year == human.year && iq == human.iq && Objects.equals(name, human.name) && Objects.equals(surname, human.surname) && Objects.equals(pet, human.pet) && Objects.equals(schedule, human.schedule);
+        return year == human.year &&
+                Objects.equals(name, human.name) &&
+                Objects.equals(surname, human.surname);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, surname, year, iq, pet, schedule);
+        return Objects.hash(name, surname, year);
     }
 
     static {

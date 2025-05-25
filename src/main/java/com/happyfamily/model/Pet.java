@@ -7,34 +7,31 @@ public abstract class Pet {
     private Species species;
     private String nickname;
     private int age;
-    private int tricklevel;
+    private int trickLevel;
     String[] habits;
 
-    public Pet(Species species, String nickname) {
-        this.species = species;
+    public Pet() {
+        this.species = Species.UNKNOWN;
+    }
+
+    public Pet(String nickname) {
+        this();
         this.nickname = nickname;
     }
 
-    public Pet(Species species, String nickname, int age, int tricklevel, String[] habits) {
-        this.species = species;
+    public Pet(String nickname, int age, int trickLevel, String[] habits) {
+        this();
         this.nickname = nickname;
         this.age = age;
-        this.tricklevel = tricklevel;
+        this.trickLevel = trickLevel;
         this.habits = habits;
     }
 
-    public Pet(){
-    }
-
-    public void eat(){
+    public void eat() {
         System.out.println("I am eating");
     }
 
     public abstract void respond();
-
-    public void foul(){
-        System.out.println("I need to cover it up");
-    }
 
     public Species getSpecies() {
         return species;
@@ -68,12 +65,16 @@ public abstract class Pet {
         this.age = age;
     }
 
-    public int getTricklevel() {
-        return tricklevel;
+    public int getTrickLevel() {
+        return trickLevel;
     }
 
-    public void setTricklevel(int tricklevel) {
-        this.tricklevel = tricklevel;
+    public void setTrickLevel(int trickLevel) throws IllegalArgumentException {
+        if (trickLevel >= 1 && trickLevel <= 100) {
+            this.trickLevel = trickLevel;
+        } else {
+            throw new IllegalArgumentException("Invalid trick level");
+        }
     }
 
     @Override
@@ -82,7 +83,7 @@ public abstract class Pet {
                 "species=" + species +
                 ", nickname='" + nickname + '\'' +
                 ", age=" + age +
-                ", trick level=" + tricklevel +
+                ", trick level=" + trickLevel +
                 ", habits=" + Arrays.toString(habits) +
                 '}';
     }
@@ -91,13 +92,14 @@ public abstract class Pet {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Pet pet = (Pet) o;
-        return age == pet.age && tricklevel == pet.tricklevel && species == pet.species && Objects.equals(nickname, pet.nickname) && Objects.deepEquals(habits, pet.habits);
+        return age == pet.age && trickLevel == pet.trickLevel && species == pet.species && Objects.equals(nickname, pet.nickname) && Objects.deepEquals(habits, pet.habits);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(species, nickname, age, tricklevel, Arrays.hashCode(habits));
+        return Objects.hash(species, nickname, age, trickLevel, Arrays.hashCode(habits));
     }
+
     static {
         System.out.println("Pet object created");
     }
