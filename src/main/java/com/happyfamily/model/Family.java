@@ -2,6 +2,8 @@ package com.happyfamily.model;
 
 import com.happyfamily.exceptions.ChildNotFoundException;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Family implements HumanCreator {
@@ -29,7 +31,9 @@ public class Family implements HumanCreator {
         List<String> maleNames = Arrays.asList("Rasul", "Nejat", "Ali", "Rashad", "Nihad");
         List<String> femaleNames = Arrays.asList("Mansura", "Zulfiyya", "Turkan", "Selcan", "Nigar");
         int childIq = (this.getMother().getIq() + this.getFather().getIq()) / 2;
-        int currentYear = java.time.Year.now().getValue();
+        LocalDate date = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String currentYear = date.format(formatter);
 
         Human child;
         if (random.nextBoolean()) {
