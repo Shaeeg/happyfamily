@@ -1,5 +1,10 @@
 package com.happyfamily.model;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Random;
@@ -7,7 +12,7 @@ import java.util.Random;
 public class Human {
     private String name;
     private String surname;
-    private int year;
+    private long birthDate;
     private int iq;
     private Pet pet;
     private HashMap<DayOfWeek, String> schedule;
@@ -15,17 +20,19 @@ public class Human {
     private String[] maleNames = {"Rashad", "Shaig", "Ali", "Rasul"};
     private String[] femaleNames = {"Mansura", "Zulfiyya", "Selcan"};
 
-    public Human(String name, String surname, int year) {
+    public Human(String name, String surname, long birthDate) {
         this.name = name;
         this.surname = surname;
-        this.year = year;
+        this.birthDate = birthDate;
     }
 
 
-    public Human(String name, String surname, int year, int iq, Pet pet, HashMap<DayOfWeek, String> schedule) {
+    public Human(String name, String surname, String birthDate, int iq, Pet pet, HashMap<DayOfWeek, String> schedule) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate date = LocalDate.parse(birthDate, formatter);
         this.name = name;
         this.surname = surname;
-        this.year = year;
+        this.birthDate = date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
         this.iq = iq;
         this.pet = pet;
         this.schedule = schedule;
@@ -33,6 +40,12 @@ public class Human {
 
     public Human() {
 
+    }
+
+    public String describeAge() {
+        LocalDate birth = Instant.ofEpochMilli(birthDate).atZone(ZoneId.systemDefault()).toLocalDate();
+        Period period = Period.between(birth, LocalDate.now());
+        return period.getYears() + " years, " + period.getMonths() + " months, " + period.getDays() + " days";
     }
 
     public void greetPet() {
@@ -99,12 +112,12 @@ public class Human {
         this.surname = surname;
     }
 
-    public int getYear() {
-        return year;
+    public long getBirthDate() {
+        return birthDate;
     }
 
-    public void setYear(int year) {
-        this.year = year;
+    public void setBirthDate(int birthDate) {
+        this.birthDate = birthDate;
     }
 
     public int getIq() {
@@ -153,10 +166,12 @@ public class Human {
 
     @Override
     public String toString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String formattedDate = Instant.ofEpochMilli(birthDate).atZone(ZoneId.systemDefault()).toLocalDate().format(formatter);
         return "Human{" +
                 "name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
-                ", year=" + year +
+                ", birthDate=" + formattedDate +
                 ", iq=" + iq +
                 ", pet=" + pet +
                 ", schedule=" + schedule +
@@ -168,14 +183,14 @@ public class Human {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Human human = (Human) o;
-        return year == human.year &&
+        return birthDate == human.birthDate &&
                 Objects.equals(name, human.name) &&
                 Objects.equals(surname, human.surname);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, surname, year);
+        return Objects.hash(name, surname, birthDate);
     }
 
     static {

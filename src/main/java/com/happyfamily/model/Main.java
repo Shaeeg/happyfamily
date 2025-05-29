@@ -1,7 +1,5 @@
 package com.happyfamily.model;
 
-import com.happyfamily.model.*;
-
 import java.util.*;
 
 public class Main {
@@ -23,27 +21,27 @@ public class Main {
         fatherSchedule.put(DayOfWeek.MONDAY, "work");
         fatherSchedule.put(DayOfWeek.SATURDAY, "play football");
 
-        Man father = new Man("Əli", "Əliyev", 1968, 95, null, fatherSchedule);
+        Man father = new Man("Əli", "Əliyev", "01/01/1968", 95, null, fatherSchedule);
 
         HashMap<DayOfWeek, String> motherSchedule = new HashMap<>();
         motherSchedule.put(DayOfWeek.TUESDAY, "shopping");
         motherSchedule.put(DayOfWeek.SUNDAY, "relax");
 
-        Woman mother = new Woman("Zəhra", "Əliyeva", 1972, 92, null, motherSchedule);
+        Woman mother = new Woman("Zəhra", "Əliyeva", "01/01/1972", 92, null, motherSchedule);
 
         HashMap<DayOfWeek, String> childSchedule = new HashMap<>();
         childSchedule.put(DayOfWeek.MONDAY, "do homework");
         childSchedule.put(DayOfWeek.WEDNESDAY, "play games");
         childSchedule.put(DayOfWeek.FRIDAY, "go to party");
 
-        Human child = new Human("Elvin", "Əliyev", 1995, 90, null, childSchedule);
+        Human child = new Human("Elvin", "Əliyev", "01/01/1995", 90, null, childSchedule);
 
         // --- Create a Family Instance with a Set of pets ---
         Family aliyevFamily = new Family(mother, father);
         aliyevFamily.setPets((HashSet<Pet>) initialFamilyPets);
 
         aliyevFamily.addChild(child);
-        aliyevFamily.addChild(new Human("Aysel", "Əliyeva", 2000, 88, null, new HashMap<>()));
+        aliyevFamily.addChild(new Human("Aysel", "Əliyeva", "01/01/2000", 88, null, new HashMap<>()));
 
         System.out.println("Initial Family:\n" + aliyevFamily.toString());
         System.out.println("Family size: " + aliyevFamily.countFamily());
@@ -82,7 +80,7 @@ public class Main {
         System.out.println("Family children after deletion by index: " + aliyevFamily.getChildren().size());
         System.out.println("Family after child deletion by index:\n" + aliyevFamily.toString());
 
-        Human anotherChild = new Human("Leyla", "Əliyeva", 2010, 75, null, new HashMap<>());
+        Human anotherChild = new Human("Leyla", "Əliyeva", "01/01/2010", 75, null, new HashMap<>());
         aliyevFamily.addChild(anotherChild);
         System.out.println("\nAdded another child (Leyla). Family children: " + aliyevFamily.getChildren().size());
         System.out.println("Attempting to delete Leyla (by object):");
@@ -93,9 +91,9 @@ public class Main {
 
         // --- Demonstrate equals() and hashCode() ---
         System.out.println("\n--- Testing equals() and hashCode() ---");
-        Human human1 = new Human("Test", "İstifadəçi", 1990, 70, null, new HashMap<>());
-        Human human2 = new Human("Test", "İstifadəçi", 1990, 80, null, new HashMap<>());
-        Human human3 = new Human("Başqa", "İstifadəçi", 1990, 75, null, new HashMap<>());
+        Human human1 = new Human("Test", "İstifadəçi", "01/01/1990", 70, null, new HashMap<>());
+        Human human2 = new Human("Test", "İstifadəçi", "01/01/1990", 80, null, new HashMap<>());
+        Human human3 = new Human("Başqa", "İstifadəçi", "01/01/1990", 75, null, new HashMap<>());
         System.out.println("Human1 equals Human2: " + human1.equals(human2));
         System.out.println("Human1 equals Human3: " + human1.equals(human3));
         System.out.println("Human1 hash: " + human1.hashCode());
@@ -107,7 +105,7 @@ public class Main {
         System.out.println("Creating many Human objects to trigger GC...");
         List<Human> humansToDiscard = new ArrayList<>();
         for (int i = 0; i < 50000; i++) {
-            humansToDiscard.add(new Human("Disposable", "Human" + i, 2020, 50, null, new HashMap<>()));
+            humansToDiscard.add(new Human("Disposable", "Human" + i, "01/01/2020", 50, null, new HashMap<>()));
         }
         humansToDiscard = null;
         System.gc();
@@ -116,8 +114,8 @@ public class Main {
         // --- HW04: Inheritance and Polymorphism ---
         System.out.println("\n--- HW04: Inheritance and Polymorphism ---");
 
-        Man dadPolymorphism = new Man("Kamran", "Quliyev", 1970, 90, pamuk, new HashMap<>());
-        Woman momPolymorphism = new Woman("Aynur", "Quliyeva", 1972, 88, qizil_baliq, new HashMap<>());
+        Man dadPolymorphism = new Man("Kamran", "Quliyev", "01/01/1970", 90, pamuk, new HashMap<>());
+        Woman momPolymorphism = new Woman("Aynur", "Quliyeva", "01/01/1972", 88, qizil_baliq, new HashMap<>());
 
         dadPolymorphism.greetPet();
         momPolymorphism.greetPet();
