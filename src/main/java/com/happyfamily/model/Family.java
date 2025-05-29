@@ -1,7 +1,5 @@
 package com.happyfamily.model;
 
-import com.happyfamily.exceptions.ChildNotFoundException;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;

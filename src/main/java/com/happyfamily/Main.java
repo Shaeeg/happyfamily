@@ -1,4 +1,11 @@
-package com.happyfamily.model;
+package com.happyfamily;
+
+import com.happyfamily.controller.FamilyController;
+import com.happyfamily.dao.impl.CollectionFamilyDAO;
+import com.happyfamily.dao.inter.FamilyDAO;
+import com.happyfamily.model.*;
+import com.happyfamily.service.impl.FamilyServiceImpl;
+import com.happyfamily.service.inter.FamilyService;
 
 import java.util.*;
 
@@ -141,5 +148,47 @@ public class Main {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+
+
+
+
+        System.out.println("\u001B[32m"+"\n--- Family Management: Testing Family CRUD operations ---");
+
+        FamilyController familyController = new FamilyController();
+
+        Family huseynovFamily = new Family(
+                new Woman("Nargis", "Huseynova", "01/01/1985", 89, pamuk, new HashMap<>()),
+                new Man("Vuqar", "Huseynov", "01/01/1982", 91, garabash, new HashMap<>())
+        );
+        huseynovFamily.setPets(new HashSet<>(List.of(robot_pisik)));
+
+        Family mammadovFamily = new Family(
+                new Woman("Xadica", "Mammadova", "01/01/1985", 89, pamuk, new HashMap<>()),
+                new Man("Ahmad", "Mammadov", "01/01/1982", 91, garabash, new HashMap<>())
+        );
+        mammadovFamily.setPets(new HashSet<>(List.of(qizil_baliq)));
+
+        familyController.saveFamily(aliyevFamily);
+        familyController.saveFamily(huseynovFamily);
+        familyController.saveFamily(mammadovFamily);
+
+        System.out.println("\n--- All families saved successfully ---");
+        familyController.getAllFamilies().forEach(System.out::println);
+
+        System.out.println("\n--- Retrieving families by index ---");
+        System.out.println("Family at index 0: " + familyController.getFamilyByIndex(0));
+        System.out.println("Family at index 1: " + familyController.getFamilyByIndex(1));
+        System.out.println("Family at index 2: " + familyController.getFamilyByIndex(2));
+
+        System.out.println("\n--- Deleting family by object (Aliyev family) ---");
+        System.out.println("Deleted by object: " + familyController.deleteFamily(aliyevFamily));
+
+        System.out.println("\n--- Deleting family by index (0) ---");
+        System.out.println("Deleted by index 0: " + familyController.deleteFamily(1));
+
+        System.out.println("\n--- Remaining families after deletions ---");
+        familyController.getAllFamilies().forEach(System.out::println);
+
     }
 }
