@@ -1,14 +1,24 @@
 package com.happyfamily.model;
 
-public class Fish extends Pet {
+import java.util.Set;
 
-    public Fish(String nickname, int age, int trickLevel, String[] habits) {
+public class Fish extends Pet {
+    public Fish(String nickname) {
+        super(nickname);
+        setSpecies(Species.FISH);
+    }
+
+    public Fish(String nickname, int age, int trickLevel, Set<String> habits) {
         super(nickname, age, trickLevel, habits);
+        setSpecies(Species.FISH);
+    }
+
+    public Fish() {
         setSpecies(Species.FISH);
     }
 
     @Override
     public void respond() {
-        System.out.printf("Blub blub! Hello, owner. I am - %s. I miss you!\n", getNickname());
+        System.out.println("Blub blub, I am a fish " + getNickname() + ". I miss you!");
     }
 }

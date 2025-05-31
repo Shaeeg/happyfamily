@@ -1,83 +1,31 @@
 package com.happyfamily.model;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class Family implements HumanCreator {
+public class Family implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Human mother;
     private Human father;
     private List<Human> children;
-    private HashSet<Pet> pets;
+    private Set<Pet> pets;
 
-    public Family() {
-        this.children = new ArrayList<Human>();
-        this.pets = new HashSet<>();
+    static {
+        System.out.println("Family class is being loaded.");
+    }
+
+    {
+        System.out.println("Family object is being created.");
     }
 
     public Family(Human mother, Human father) {
         this.mother = mother;
         this.father = father;
         this.children = new ArrayList<>();
+        this.pets = new HashSet<>();
         this.mother.setFamily(this);
         this.father.setFamily(this);
-    }
-
-    @Override
-    public Human bornChild(Family family, String fatherName, String motherName) {
-        Random random = new Random();
-        List<String> maleNames = Arrays.asList("Rasul", "Nejat", "Ali", "Rashad", "Nihad");
-        List<String> femaleNames = Arrays.asList("Mansura", "Zulfiyya", "Turkan", "Selcan", "Nigar");
-        int childIq = (this.getMother().getIq() + this.getFather().getIq()) / 2;
-        LocalDate date = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        String currentYear = date.format(formatter);
-
-        Human child;
-        if (random.nextBoolean()) {
-            String childName = maleNames.get(random.nextInt(maleNames.size()));
-            child = new Man(childName, father.getSurname(), currentYear, childIq, null, null);
-        } else {
-            String childName = femaleNames.get(random.nextInt(femaleNames.size()));
-            child = new Woman(childName, father.getSurname(), currentYear, childIq, null, null);
-        }
-
-        child.setFamily(this);
-        this.addChild(child);
-        return child;
-    }
-
-    public void addChild(Human child) {
-        if (child != null) {
-            this.children.add(child);
-            child.setFamily(this);
-        }
-    }
-
-    public boolean deleteChild(int index) {
-        if (index >= 0 && index < children.size()) {
-            Human removedChild = children.remove(index);
-            if (removedChild != null) {
-                removedChild.setFamily(null);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public boolean deleteChild(Human child) {
-        if (child == null) {
-            return false;
-        }
-        boolean removed = children.remove(child);
-        if (removed) {
-            child.setFamily(null);
-        }
-        return removed;
-    }
-
-    public int countFamily() {
-        return 2 + this.children.size() + this.pets.size();
     }
 
     public Human getMother() {
@@ -104,30 +52,93 @@ public class Family implements HumanCreator {
         this.children = children;
     }
 
-    public HashSet<Pet> getPets() {
+    public Set<Pet> getPets() {
         return pets;
     }
 
-    public void setPets(HashSet<Pet> pets) {
+    public void setPets(Set<Pet> pets) {
         this.pets = pets;
+    }
+
+    public void addChild(Human child) {
+        children.add(child);
+        child.setFamily(this);
+    }
+
+    public boolean deleteChild(Human child) {
+        boolean removed = children.remove(child);
+        if (removed) {
+            child.setFamily(null);
+        }
+        return removed;
+    }
+
+    public boolean deleteChild(int index) {
+        if (index >= 0 && index < children.size()) {
+            Human child = children.remove(index);
+            child.setFamily(null);
+            return true;
+        }
+        return false;
+    }
+
+    public void addPet(Pet pet) {
+        pets.add(pet);
+    }
+
+    public int countFamily() {
+        return 2 + children.size() + pets.size();
     }
 
     @Override
     public String toString() {
-        return "Family{" +
-                "mother=" + mother +
-                ", father=" + father +
-                ", children=" + children +
-                ", pets=" + pets +
-                '}';
+        StringBuilder sb = new StringBuilder("Family{");
+        sb.append("mother=").append(mother.toString());
+        sb.append(", father=").append(father.toString());
+        sb.append(", children=").append(children.toString());
+        sb.append(", pets=").append(pets.toString());
+        sb.append('}');
+        return sb.toString();
     }
 
-    static {
-        System.out.println("Family class is being loaded.");
+    public String prettyFormat() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("family:\n");
+        sb.append("\tmother: {").append(mother.prettyFormat().trim()).append("},\n");
+        sb.append("\tfather: {").append(father.prettyFormat().trim()).append("},\n");
+        if (!children.isEmpty()) {
+            sb.append("\tchildren: [\n");
+            for (Human child : children) {
+                String childType = (child instanceof Man) ? "boy" : (child instanceof Woman) ? "girl" : "child";
+                sb.append(String.format("\t\t%s: {%s}\n", childType, child.prettyFormat().trim()));
+            }
+            sb.append("\t]\n");
+        }
+        if (!pets.isEmpty()) {
+            sb.append("\tpets: [\n");
+            String petsFormatted = pets.stream()
+                    .map(pet -> "\t\t{" + pet.prettyFormat().replace("\n", "\n\t\t").trim() + "}")
+                    .collect(Collectors.joining(",\n"));
+            sb.append(petsFormatted.replace("\t\t}","}").replace(",\n\t\t}","},\n\t\t"));
+            sb.append("\t]\n");
+        }
+        return sb.toString();
     }
 
 
-    {
-        System.out.println("A new Family object is being created.");
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Family family = (Family) o;
+        return mother.equals(family.mother) &&
+                father.equals(family.father) &&
+                children.equals(family.children) &&
+                pets.equals(family.pets);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mother, father, children, pets);
     }
 }

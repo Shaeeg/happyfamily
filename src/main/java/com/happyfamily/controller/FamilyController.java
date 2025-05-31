@@ -1,38 +1,89 @@
 package com.happyfamily.controller;
 
-import com.happyfamily.dao.impl.CollectionFamilyDAO;
-import com.happyfamily.dao.inter.FamilyDAO;
+import com.happyfamily.exceptions.FamilyOverFlowException;
 import com.happyfamily.model.Family;
-import com.happyfamily.service.inter.FamilyService;
-import com.happyfamily.service.impl.FamilyServiceImpl;
+import com.happyfamily.model.Human;
+import com.happyfamily.model.Pet;
+import com.happyfamily.service.FamilyService;
 
 import java.util.List;
+import java.util.Set;
 
 public class FamilyController {
-    private final FamilyService familyService;
+    private FamilyService familyService;
+    private final int MAX_FAMILY_SIZE = 10;
 
-    public FamilyController() {
-        FamilyDAO dao = new CollectionFamilyDAO();
-        this.familyService = new FamilyServiceImpl(dao);
+    public FamilyController(FamilyService familyService) {
+        this.familyService = familyService;
     }
 
     public List<Family> getAllFamilies() {
         return familyService.getAllFamilies();
     }
 
-    public Family getFamilyByIndex(int index) {
-        return familyService.getFamilyByIndex(index);
+    public void displayAllFamilies() {
+        familyService.displayAllFamilies();
     }
 
-    public boolean deleteFamily(int index) {
-        return familyService.deleteFamily(index);
+    public List<Family> getFamiliesBiggerThan(int count) {
+        return familyService.getFamiliesBiggerThan(count);
     }
 
-    public boolean deleteFamily(Family family) {
-        return familyService.deleteFamily(family);
+    public List<Family> getFamiliesLessThan(int count) {
+        return familyService.getFamiliesLessThan(count);
     }
 
-    public void saveFamily(Family family) {
-        familyService.saveFamily(family);
+    public int countFamiliesWithMemberNumber(int count) {
+        return familyService.countFamiliesWithMemberNumber(count);
+    }
+
+    public void createNewFamily(Human mother, Human father) {
+        familyService.createNewFamily(mother, father);
+    }
+
+    public boolean deleteFamilyByIndex(int index) {
+        return familyService.deleteFamilyByIndex(index);
+    }
+
+    public Family bornChild(Family family, String masculineName, String feminineName) {
+        if (family.countFamily() + 1 > MAX_FAMILY_SIZE) {
+            throw new FamilyOverFlowException("Cannot add child. Family size exceeds " + MAX_FAMILY_SIZE + " members.");
+        }
+        return familyService.bornChild(family, masculineName, feminineName);
+    }
+
+    public Family adoptChild(Family family, Human child) {
+        if (family.countFamily() + 1 > MAX_FAMILY_SIZE) {
+            throw new FamilyOverFlowException("Cannot adopt child. Family size exceeds " + MAX_FAMILY_SIZE + " members.");
+        }
+        return familyService.adoptChild(family, child);
+    }
+
+    public void deleteAllChildrenOlderThen(int age) {
+        familyService.deleteAllChildrenOlderThen(age);
+    }
+
+    public int count() {
+        return familyService.count();
+    }
+
+    public Family getFamilyById(int index) {
+        return familyService.getFamilyById(index);
+    }
+
+    public Set<Pet> getPets(int familyIndex) {
+        return familyService.getPets(familyIndex);
+    }
+
+    public void addPet(int familyIndex, Pet pet) {
+        familyService.addPet(familyIndex, pet);
+    }
+
+    public void saveData() {
+        familyService.saveData();
+    }
+
+    public void loadData() {
+        familyService.loadData();
     }
 }

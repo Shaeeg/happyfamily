@@ -1,19 +1,29 @@
 package com.happyfamily.model;
 
-public class RoboCat extends Pet implements Foulable {
+import java.util.Set;
 
-    public RoboCat(String nickname, int age, int trickLevel, String[] habits) {
+public class RoboCat extends Pet implements Foulable {
+    public RoboCat(String nickname) {
+        super(nickname);
+        setSpecies(Species.ROBOCAT);
+    }
+
+    public RoboCat(String nickname, int age, int trickLevel, Set<String> habits) {
         super(nickname, age, trickLevel, habits);
+        setSpecies(Species.ROBOCAT);
+    }
+
+    public RoboCat() {
         setSpecies(Species.ROBOCAT);
     }
 
     @Override
     public void respond() {
-        System.out.printf("Beep boop! Hello, owner. I am - %s. I miss you!\n", getNickname());
+        System.out.println("Bleep bloop, I am RoboCat " + getNickname() + ". I miss you!");
     }
 
     @Override
     public void foul() {
-        System.out.println("ERROR: Malfunction detected. Engaging self-cleaning protocol.");
+        System.out.println("Initiating self-cleaning protocol.");
     }
 }

@@ -2,193 +2,324 @@ package com.happyfamily;
 
 import com.happyfamily.controller.FamilyController;
 import com.happyfamily.dao.impl.CollectionFamilyDAO;
-import com.happyfamily.dao.inter.FamilyDAO;
 import com.happyfamily.model.*;
-import com.happyfamily.service.impl.FamilyServiceImpl;
-import com.happyfamily.service.inter.FamilyService;
+import com.happyfamily.service.FamilyService;
 
+import com.happyfamily.exceptions.FamilyOverFlowException;
+
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 public class Main {
+
+    private static FamilyController familyController;
+    private static Scanner scanner = new Scanner(System.in);
+
     public static void main(String[] args) {
-        System.out.println("--- Happy Family Project Test Started (Azerbaijani Names) ---");
+        CollectionFamilyDAO collectionFamilyDao = new CollectionFamilyDAO();
+        FamilyService familyService = new FamilyService(collectionFamilyDao);
+        familyController = new FamilyController(familyService);
 
-        // --- Create Pet Instances ---
-        Dog garabash = new Dog("Garabash", 4, 70, new String[]{"bark", "run", "sleep"});
-        DomesticCat pamuk = new DomesticCat("Pamuk", 2, 85, new String[]{"meow", "purr", "play"});
-        Fish qizil_baliq = new Fish("Qızılbalıq", 1, 15, new String[]{"swim"});
-        RoboCat robot_pisik = new RoboCat("RobotPişik", 6, 90, new String[]{"charge", "guard"});
+        System.out.println("--- Welcome to the Happy Family Console Application ---");
 
-        Set<Pet> initialFamilyPets = new HashSet<>();
-        initialFamilyPets.add(garabash);
-        initialFamilyPets.add(pamuk);
+        displayMenu();
+        handleUserInput();
 
-        // --- Create Human Instances with HashMap schedule ---
-        HashMap<DayOfWeek, String> fatherSchedule = new HashMap<>();
-        fatherSchedule.put(DayOfWeek.MONDAY, "work");
-        fatherSchedule.put(DayOfWeek.SATURDAY, "play football");
+        scanner.close();
+        System.out.println("Exiting Happy Family Console Application. Goodbye!");
+    }
 
-        Man father = new Man("Əli", "Əliyev", "01/01/1968", 95, null, fatherSchedule);
+    private static void displayMenu() {
+        System.out.println("\n--- Main Menu ---");
+        System.out.println("1. Load data (reloads families from file)");
+        System.out.println("2. Display all families");
+        System.out.println("3. Get families bigger than a specified number of members");
+        System.out.println("4. Get families less than a specified number of members");
+        System.out.println("5. Count families with a specified number of members");
+        System.out.println("6. Create a new family");
+        System.out.println("7. Delete a family by its index");
+        System.out.println("8. Edit a family by its index");
+        System.out.println("9. Remove all children older than a specified age");
+        System.out.println("10. Save data (saves all current families to file)");
+        System.out.println("0. Exit");
+        System.out.print("Enter your choice: ");
+    }
 
-        HashMap<DayOfWeek, String> motherSchedule = new HashMap<>();
-        motherSchedule.put(DayOfWeek.TUESDAY, "shopping");
-        motherSchedule.put(DayOfWeek.SUNDAY, "relax");
+    private static void handleUserInput() {
+        while (true) {
+            int choice = -1;
+            try {
+                choice = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number from the menu.");
+                scanner.next();
+                displayMenu();
+                continue;
+            }
+            scanner.nextLine();
 
-        Woman mother = new Woman("Zəhra", "Əliyeva", "01/01/1972", 92, null, motherSchedule);
-
-        HashMap<DayOfWeek, String> childSchedule = new HashMap<>();
-        childSchedule.put(DayOfWeek.MONDAY, "do homework");
-        childSchedule.put(DayOfWeek.WEDNESDAY, "play games");
-        childSchedule.put(DayOfWeek.FRIDAY, "go to party");
-
-        Human child = new Human("Elvin", "Əliyev", "01/01/1995", 90, null, childSchedule);
-
-        // --- Create a Family Instance with a Set of pets ---
-        Family aliyevFamily = new Family(mother, father);
-        aliyevFamily.setPets((HashSet<Pet>) initialFamilyPets);
-
-        aliyevFamily.addChild(child);
-        aliyevFamily.addChild(new Human("Aysel", "Əliyeva", "01/01/2000", 88, null, new HashMap<>()));
-
-        System.out.println("Initial Family:\n" + aliyevFamily.toString());
-        System.out.println("Family size: " + aliyevFamily.countFamily());
-
-        // --- Demonstrate Human methods with multiple pets (if applicable) ---
-        child.setPet(garabash);
-        child.greetPet();
-        child.describePet();
-        child.feedPet(true);
-
-        father.setPet(pamuk);
-        father.greetPet();
-        father.describePet();
-
-        System.out.println("\n--- Testing Schedule (HashMap) ---");
-        System.out.println("Father's schedule on Monday: " + father.getSchedule().get(DayOfWeek.MONDAY));
-        System.out.println("Child's schedule on Friday: " + child.getSchedule().get(DayOfWeek.FRIDAY));
-        System.out.println("Child's schedule on Sunday: " + child.getSchedule().get(DayOfWeek.SUNDAY));
-
-        // --- Demonstrate adding/removing pets in Family's Set ---
-        System.out.println("\n--- Testing Family's Pet Set ---");
-        System.out.println("Pets in family initially: " + aliyevFamily.getPets().size());
-        aliyevFamily.getPets().add(qizil_baliq);
-        System.out.println("Pets in family after adding Qızılbalıq: " + aliyevFamily.getPets().size());
-        System.out.println("Family details with Qızılbalıq added:\n" + aliyevFamily.toString());
-
-        aliyevFamily.getPets().remove(garabash);
-        System.out.println("Pets in family after removing Garabash: " + aliyevFamily.getPets().size());
-        System.out.println("Family details with Garabash removed:\n" + aliyevFamily.toString());
-
-        // --- Demonstrate deleteChild(int index) and deleteChild(Human) ---
-        System.out.println("\n--- Testing Child Deletion ---");
-        System.out.println("Family children before deletion: " + aliyevFamily.getChildren().size());
-        boolean deleted = aliyevFamily.deleteChild(0); // Aysel will be at index 0
-        System.out.println("Child deleted by index (Aysel): " + deleted);
-        System.out.println("Family children after deletion by index: " + aliyevFamily.getChildren().size());
-        System.out.println("Family after child deletion by index:\n" + aliyevFamily.toString());
-
-        Human anotherChild = new Human("Leyla", "Əliyeva", "01/01/2010", 75, null, new HashMap<>());
-        aliyevFamily.addChild(anotherChild);
-        System.out.println("\nAdded another child (Leyla). Family children: " + aliyevFamily.getChildren().size());
-        System.out.println("Attempting to delete Leyla (by object):");
-        deleted = aliyevFamily.deleteChild(anotherChild);
-        System.out.println("Leyla deleted by object: " + deleted);
-        System.out.println("Family children after deletion by object: " + aliyevFamily.getChildren().size());
-        System.out.println("Family after deleting Leyla by object:\n" + aliyevFamily.toString());
-
-        // --- Demonstrate equals() and hashCode() ---
-        System.out.println("\n--- Testing equals() and hashCode() ---");
-        Human human1 = new Human("Test", "İstifadəçi", "01/01/1990", 70, null, new HashMap<>());
-        Human human2 = new Human("Test", "İstifadəçi", "01/01/1990", 80, null, new HashMap<>());
-        Human human3 = new Human("Başqa", "İstifadəçi", "01/01/1990", 75, null, new HashMap<>());
-        System.out.println("Human1 equals Human2: " + human1.equals(human2));
-        System.out.println("Human1 equals Human3: " + human1.equals(human3));
-        System.out.println("Human1 hash: " + human1.hashCode());
-        System.out.println("Human2 hash: " + human2.hashCode());
-        System.out.println("Human3 hash: " + human3.hashCode());
-
-        // --- HW03: finalize() and Garbage Collector ---
-        System.out.println("\n--- HW03: finalize() and Garbage Collector ---");
-        System.out.println("Creating many Human objects to trigger GC...");
-        List<Human> humansToDiscard = new ArrayList<>();
-        for (int i = 0; i < 50000; i++) {
-            humansToDiscard.add(new Human("Disposable", "Human" + i, "01/01/2020", 50, null, new HashMap<>()));
+            switch (choice) {
+                case 1:
+                    loadData();
+                    break;
+                case 2:
+                    familyController.displayAllFamilies();
+                    break;
+                case 3:
+                    getFamiliesBiggerThan();
+                    break;
+                case 4:
+                    getFamiliesLessThan();
+                    break;
+                case 5:
+                    countFamiliesWithMemberNumber();
+                    break;
+                case 6:
+                    createNewFamily();
+                    break;
+                case 7:
+                    deleteFamilyByIndex();
+                    break;
+                case 8:
+                    editFamilyByIndex();
+                    break;
+                case 9:
+                    removeAllChildrenOlderThen();
+                    break;
+                case 10:
+                    saveData();
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please select a number from 0 to 10.");
+                    break;
+            }
+            displayMenu();
         }
-        humansToDiscard = null;
-        System.gc();
-        System.out.println("GC requested. Check console for finalize messages.");
+    }
 
-        // --- HW04: Inheritance and Polymorphism ---
-        System.out.println("\n--- HW04: Inheritance and Polymorphism ---");
+    private static void loadData() {
+        System.out.println("Loading data from file...");
+        familyController.loadData();
+        System.out.println("Data loaded. Current families:");
+        familyController.displayAllFamilies();
+    }
 
-        Man dadPolymorphism = new Man("Kamran", "Quliyev", "01/01/1970", 90, pamuk, new HashMap<>());
-        Woman momPolymorphism = new Woman("Aynur", "Quliyeva", "01/01/1972", 88, qizil_baliq, new HashMap<>());
+    private static void saveData() {
+        System.out.println("Saving data to file...");
+        familyController.saveData();
+        System.out.println("Data saved successfully.");
+    }
 
-        dadPolymorphism.greetPet();
-        momPolymorphism.greetPet();
-        dadPolymorphism.repairCar();
-        momPolymorphism.makeup();
+    private static void getFamiliesBiggerThan() {
+        System.out.print("Enter the number of members: ");
+        try {
+            int count = scanner.nextInt();
+            scanner.nextLine();
+            List<Family> families = familyController.getFamiliesBiggerThan(count);
+            if (families.isEmpty()) {
+                System.out.println("No families bigger than " + count + " members.");
+            } else {
+                families.forEach(family -> System.out.println(family.prettyFormat()));
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+            scanner.nextLine();
+        }
+    }
 
-        // --- Advanced Task: bornChild ---
-        System.out.println("\n--- Advanced Task: bornChild ---");
-        Family bornChildFamily = new Family(momPolymorphism, dadPolymorphism);
-        bornChildFamily.setPets(new HashSet<>(Arrays.asList(garabash, pamuk)));
+    private static void getFamiliesLessThan() {
+        System.out.print("Enter the number of members: ");
+        try {
+            int count = scanner.nextInt();
+            scanner.nextLine();
+            List<Family> families = familyController.getFamiliesLessThan(count);
+            if (families.isEmpty()) {
+                System.out.println("No families less than " + count + " members.");
+            } else {
+                families.forEach(family -> System.out.println(family.prettyFormat()));
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+            scanner.nextLine();
+        }
+    }
 
-        System.out.println("Family before child birth: " + bornChildFamily.countFamily());
-        // Note: The bornChild method in Family.java still picks from a generic list of names.
-        // To make the newly born child also have an Azerbaijani name, you would need to modify
-        // the `randomNames` list directly in the `Family.bornChild` implementation.
-        Human newChild = bornChildFamily.bornChild(bornChildFamily, dadPolymorphism.getName(), momPolymorphism.getName());
-        System.out.println("Newly born child: " + newChild.toString());
-        System.out.println("Family after child birth: " + bornChildFamily.countFamily());
-        System.out.println("Family children list: " + Arrays.toString(bornChildFamily.getChildren().toArray()));
+    private static void countFamiliesWithMemberNumber() {
+        System.out.print("Enter the number of members to count: ");
+        try {
+            int count = scanner.nextInt();
+            scanner.nextLine();
+            System.out.printf("Number of families with %d members: %d\n", count, familyController.countFamiliesWithMemberNumber(count));
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+            scanner.nextLine();
+        }
+    }
+
+    private static void createNewFamily() {
+        System.out.println("--- Creating New Family ---");
+        System.out.print("Enter mother's name: ");
+        String mName = scanner.nextLine();
+        System.out.print("Enter mother's surname: ");
+        String mSurname = scanner.nextLine();
+        System.out.print("Enter mother's birth date (DD/MM/YYYY): ");
+        String mBirthDateStr = scanner.nextLine();
+        System.out.print("Enter mother's IQ: ");
+        int mIq = -1;
+        try {
+            mIq = scanner.nextInt();
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input for IQ. Please enter a number.");
+            scanner.nextLine();
+            return;
+        }
+
+
+        System.out.print("Enter father's name: ");
+        String fName = scanner.nextLine();
+        System.out.print("Enter father's surname: ");
+        String fSurname = scanner.nextLine();
+        System.out.print("Enter father's birth date (DD/MM/YYYY): ");
+        String fBirthDateStr = scanner.nextLine();
+        System.out.print("Enter father's IQ: ");
+        int fIq = -1;
+        try {
+            fIq = scanner.nextInt();
+            scanner.nextLine();
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input for IQ. Please enter a number.");
+            scanner.nextLine();
+            return;
+        }
 
         try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            long mBirthDate = Human.parseDateToMillis(mBirthDateStr);
+            long fBirthDate = Human.parseDateToMillis(fBirthDateStr);
+
+            Human mother = new Woman(mName, mSurname, mBirthDate, mIq, null, new HashMap<>());
+            Human father = new Man(fName, fSurname, fBirthDate, fIq, null, new HashMap<>());
+            familyController.createNewFamily(mother, father);
+            System.out.println("Family created successfully!");
+        } catch (IllegalArgumentException | DateTimeParseException e) {
+            System.out.println("Error creating family: " + e.getMessage() + ". Please check date format (DD/MM/YYYY) and IQ.");
+        }
+    }
+
+    private static void deleteFamilyByIndex() {
+        System.out.print("Enter the index of the family to delete: ");
+        try {
+            int index = scanner.nextInt();
+            scanner.nextLine();
+            if (familyController.deleteFamilyByIndex(index)) {
+                System.out.println("Family at index " + index + " deleted successfully.");
+            } else {
+                System.out.println("Family at index " + index + " not found or could not be deleted.");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+            scanner.nextLine();
+        }
+    }
+
+    private static void editFamilyByIndex() {
+        System.out.print("Enter the index of the family to edit: ");
+        int familyIndex = -1;
+        try {
+            familyIndex = scanner.nextInt();
+            scanner.nextLine();
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid number for family index.");
+            scanner.nextLine();
+            return;
+        }
+
+        Family familyToEdit = familyController.getFamilyById(familyIndex);
+
+        if (familyToEdit == null) {
+            System.out.println("Family not found at index " + familyIndex);
+            return;
+        }
+
+        System.out.println("\n--- Edit Family Menu ---");
+        System.out.println("1. Give birth to a baby");
+        System.out.println("2. Adopt a child");
+        System.out.println("3. Return to main menu");
+        System.out.print("Enter your choice: ");
+
+        int editChoice = -1;
+        try {
+            editChoice = scanner.nextInt();
+            scanner.nextLine();
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a number.");
+            scanner.nextLine();
+            return;
         }
 
 
+        switch (editChoice) {
+            case 1:
+                System.out.print("Enter name for a boy: ");
+                String boyName = scanner.nextLine();
+                System.out.print("Enter name for a girl: ");
+                String girlName = scanner.nextLine();
+                try {
+                    familyController.bornChild(familyToEdit, boyName, girlName);
+                    System.out.println("Child born to family " + familyIndex + " successfully!");
+                } catch (FamilyOverFlowException e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
+                break;
+            case 2:
+                System.out.print("Enter child's name: ");
+                String adoptedChildName = scanner.nextLine();
+                System.out.print("Enter child's surname: ");
+                String adoptedChildSurname = scanner.nextLine();
+                System.out.print("Enter child's birth date (DD/MM/YYYY): ");
+                String adoptedChildBirthDateStr = scanner.nextLine();
+                System.out.print("Enter child's IQ: ");
+                int adoptedChildIq = -1;
+                try {
+                    adoptedChildIq = scanner.nextInt();
+                    scanner.nextLine();
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input for IQ. Please enter a number.");
+                    scanner.nextLine();
+                    return;
+                }
 
+                try {
+                    long adoptedChildBirthDate = Human.parseDateToMillis(adoptedChildBirthDateStr);
+                    Human adoptedChild = new Human(adoptedChildName, adoptedChildSurname, adoptedChildBirthDate, adoptedChildIq);
+                    familyController.adoptChild(familyToEdit, adoptedChild);
+                    System.out.println("Child adopted to family " + familyIndex + " successfully!");
+                } catch (IllegalArgumentException | DateTimeParseException e) {
+                    System.out.println("Error adopting child: " + e.getMessage() + ". Please check date format (DD/MM/YYYY) and IQ.");
+                } catch (FamilyOverFlowException e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
+                break;
+            case 3:
+                System.out.println("Returning to main menu.");
+                break;
+            default:
+                System.out.println("Invalid choice for editing family.");
+                break;
+        }
+    }
 
-
-        System.out.println("\u001B[32m"+"\n--- Family Management: Testing Family CRUD operations ---");
-
-        FamilyController familyController = new FamilyController();
-
-        Family huseynovFamily = new Family(
-                new Woman("Nargis", "Huseynova", "01/01/1985", 89, pamuk, new HashMap<>()),
-                new Man("Vuqar", "Huseynov", "01/01/1982", 91, garabash, new HashMap<>())
-        );
-        huseynovFamily.setPets(new HashSet<>(List.of(robot_pisik)));
-
-        Family mammadovFamily = new Family(
-                new Woman("Xadica", "Mammadova", "01/01/1985", 89, pamuk, new HashMap<>()),
-                new Man("Ahmad", "Mammadov", "01/01/1982", 91, garabash, new HashMap<>())
-        );
-        mammadovFamily.setPets(new HashSet<>(List.of(qizil_baliq)));
-
-        familyController.saveFamily(aliyevFamily);
-        familyController.saveFamily(huseynovFamily);
-        familyController.saveFamily(mammadovFamily);
-
-        System.out.println("\n--- All families saved successfully ---");
-        familyController.getAllFamilies().forEach(System.out::println);
-
-        System.out.println("\n--- Retrieving families by index ---");
-        System.out.println("Family at index 0: " + familyController.getFamilyByIndex(0));
-        System.out.println("Family at index 1: " + familyController.getFamilyByIndex(1));
-        System.out.println("Family at index 2: " + familyController.getFamilyByIndex(2));
-
-        System.out.println("\n--- Deleting family by object (Aliyev family) ---");
-        System.out.println("Deleted by object: " + familyController.deleteFamily(aliyevFamily));
-
-        System.out.println("\n--- Deleting family by index (0) ---");
-        System.out.println("Deleted by index 0: " + familyController.deleteFamily(1));
-
-        System.out.println("\n--- Remaining families after deletions ---");
-        familyController.getAllFamilies().forEach(System.out::println);
-
+    private static void removeAllChildrenOlderThen() {
+        System.out.print("Enter the age to remove children older than: ");
+        try {
+            int age = scanner.nextInt();
+            scanner.nextLine();
+            familyController.deleteAllChildrenOlderThen(age);
+            System.out.println("Children older than " + age + " removed from all families.");
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+            scanner.nextLine();
+        }
     }
 }
